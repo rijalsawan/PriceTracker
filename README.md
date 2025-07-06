@@ -1,44 +1,67 @@
-# Amazon Price Tracker
+# 🛒 Amazon Price Tracker
 
-A full-stack web application that tracks Amazon product prices and notifies users when prices drop or reach target levels.
+A full-stack application for tracking Amazon product prices with intelligent monitoring and notifications.
 
-## Features
+![Price Tracker](https://img.shields.io/badge/Price-Tracker-blue)
+![React](https://img.shields.io/badge/React-19.1.0-blue)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)
 
-- 🔍 **Product Tracking**: Add Amazon products by URL and monitor price changes
-- 🎯 **Target Prices**: Set desired price points and get notified when reached
-- 📊 **Price History**: View detailed price charts and statistics with historical analysis
-- 📈 **Enhanced Charts**: Interactive charts with multiple time period filters (1W, 1M, 3M, 6M, 1Y)
-- � **Price Trends**: See price changes across different time periods with percentage indicators
-- �🔔 **Smart Notifications**: Email alerts for price drops and target achievements
-- 📱 **Responsive Design**: Modern, mobile-friendly interface
-- 🔐 **User Authentication**: Secure user accounts with JWT
-- ⚡ **Real-time Updates**: Automatic price checking with background jobs
-- 🔄 **Robust Scraping**: Cheerio-based scraper with fallback mechanisms
+## ✨ Features
 
-## Tech Stack
+### 🔍 **Product Search & Discovery**
+- **In-app Amazon search** with real-time suggestions
+- **Add products by URL** - supports all Amazon URL formats
+- **Beautiful product cards** with images, ratings, and prices
+- **Responsive design** optimized for all devices
 
-### Frontend
-- **React 18** with TypeScript
+### 📊 **Price Tracking & History**
+- **Real-time price monitoring** with automated checks
+- **Interactive price charts** using Chart.js
+- **Price change notifications** via email
+- **Historical data visualization** for informed decisions
+
+### 🎯 **Smart Features**
+- **Search state persistence** - maintain search context across navigation
+- **Target price alerts** - get notified when prices drop below your threshold
+- **User authentication** with JWT tokens
+- **Modern UI/UX** with Tailwind CSS and smooth animations
+
+### 🚀 **Technical Highlights**
+- **Cheerio-based scraping** for reliable Amazon data extraction
+- **PostgreSQL database** with Prisma ORM
+- **RESTful API** with comprehensive error handling
+- **Responsive design** with mobile-first approach
+
+## 🏗️ Tech Stack
+
+### **Frontend**
+- **React 19.1** with TypeScript
 - **Tailwind CSS** for styling
 - **React Router** for navigation
-- **Recharts** for price visualization
-- **Headless UI** for accessible components
+- **Chart.js** for data visualization
+- **Axios** for API communication
 - **React Hot Toast** for notifications
 
-### Backend
-- **Node.js** with Express.js
+### **Backend**
+- **Node.js** with Express
 - **TypeScript** for type safety
 - **Prisma ORM** with PostgreSQL
-- **Puppeteer** for web scraping
-- **Node Cron** for scheduled tasks
 - **JWT** for authentication
+- **Cheerio** for web scraping
 - **Nodemailer** for email notifications
+- **Rate limiting** and security middleware
 
-## Installation
+### **Deployment**
+- **Frontend**: Vercel
+- **Backend**: Railway
+- **Database**: Railway PostgreSQL
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+ and npm
-- PostgreSQL database
+- Node.js 18+
 - Git
 
 ### 1. Clone the Repository
@@ -48,192 +71,124 @@ cd PriceTracker
 ```
 
 ### 2. Backend Setup
-
 ```bash
 cd backend
-
-# Install dependencies
 npm install
-
-# Set up environment variables
 cp .env.example .env
-# Edit .env with your database and email settings
-
-# Generate Prisma client
-npx prisma generate
-
-# Run database migrations
-npx prisma migrate dev
-
-# Start development server
+# Edit .env with your configuration
 npm run dev
 ```
 
 ### 3. Frontend Setup
-
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Set up environment variables
-# Create .env file with:
-# REACT_APP_API_URL=http://localhost:5000/api
-
-# Start development server
+cp .env.example .env
+# Edit .env with your backend URL
 npm start
 ```
 
-## Environment Variables
+### 4. Database Setup
+```bash
+cd backend
+npx prisma migrate dev
+npx prisma generate
+```
 
-### Backend (.env)
-```env
-NODE_ENV=development
-PORT=5000
+## 🔧 Configuration
 
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/pricetracker?schema=public"
+### Environment Variables
 
-# JWT
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRE=7d
-
-# Email Configuration (for notifications)
+#### Backend (.env)
+```bash
+NODE_ENV=production
+PORT=8000
+DATABASE_URL=postgresql://username:password@host:port/database
+JWT_SECRET=your-super-secret-jwt-key
+FRONTEND_URL=https://your-frontend.vercel.app
 EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
-
-# App Configuration
-FRONTEND_URL=http://localhost:3000
-SCRAPING_INTERVAL_HOURS=24
 ```
 
-### Frontend (.env)
-```env
-REACT_APP_API_URL=http://localhost:5000/api
+#### Frontend (.env)
+```bash
+REACT_APP_API_URL=https://your-backend.railway.app/api
 ```
 
-## Database Setup
+## 🚀 Deployment
 
-1. Install PostgreSQL on your system
-2. Create a new database named `pricetracker`
-3. Update the `DATABASE_URL` in your backend `.env` file
-4. Run migrations: `npx prisma migrate dev`
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Railway and Vercel.
 
-## Email Configuration
+### Quick Deploy
 
-To enable email notifications:
+1. **Backend to Railway**:
+   - Connect GitHub repository
+   - Add PostgreSQL database
+   - Configure environment variables
+   - Deploy automatically
 
-1. Use a Gmail account or other SMTP provider
-2. For Gmail, enable 2-factor authentication and create an App Password
-3. Update the email settings in your backend `.env` file
+2. **Frontend to Vercel**:
+   - Import from GitHub
+   - Set build command: `npm run build`
+   - Add environment variables
+   - Deploy automatically
 
-## Usage
-
-### Adding Products
-
-1. Register/Login to your account
-2. Click "Add Product" on the dashboard
-3. Paste an Amazon product URL
-4. Optionally set a target price
-5. Click "Add Product"
-
-### Monitoring Prices
-
-- The system automatically checks prices every hour
-- View price history and charts on product detail pages
-- **Enhanced Price Analysis**: See price trends for 1 week, 1 month, 3 months, 6 months, and 1 year
-- **Price Change Indicators**: Percentage changes with up/down arrows for each time period
-- **Interactive Charts**: Filter data by time period and view target price lines
-- Receive email notifications for significant price changes
-- Get alerts when target prices are reached
-
-### Price History Feature
-
-The app includes advanced price history analysis:
-- **Multiple Time Periods**: View price trends across different timeframes
-- **Historical Data**: Integration ready for Keepa API (see PRICE_HISTORY_GUIDE.md)
-- **Demo Mode**: Generates realistic price variations for demonstration
-- **Price Statistics**: Shows lowest, highest, and average prices
-- **Smart Refresh**: Manual refresh button for updated historical data
-
-For production use with real historical data, see `PRICE_HISTORY_GUIDE.md` for setup instructions.
-
-### Managing Products
-
-- Edit target prices and tracking status
-- View detailed price statistics
-- Delete products you no longer want to track
-
-## API Endpoints
+## 📊 API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user
 
 ### Products
-- `GET /api/products` - Get user's products
-- `POST /api/products` - Add new product
-- `GET /api/products/:id` - Get product details
-- `PUT /api/products/:id` - Update product
-- `DELETE /api/products/:id` - Delete product
-- `GET /api/products/:id/history` - Get price history
+- `GET /api/products` - Get user's tracked products
+- `POST /api/products` - Add product to tracking
+- `PUT /api/products/:id` - Update product settings
+- `DELETE /api/products/:id` - Remove product
 
-### Notifications
-- `GET /api/notifications` - Get user notifications
-- `PUT /api/notifications/:id/read` - Mark as read
-- `DELETE /api/notifications/:id` - Delete notification
+### Search
+- `GET /api/search/products` - Search Amazon products
+- `GET /api/search/suggestions` - Get search suggestions
+- `GET /api/search/product/:asin` - Get product details
 
-## Development
+## 🛡️ Security Features
 
-### Backend Commands
+- **JWT Authentication** with secure token handling
+- **Rate Limiting** to prevent abuse
+- **Input Validation** with Zod schemas
+- **CORS Configuration** for cross-origin requests
+- **Helmet.js** for security headers
+- **Password Hashing** with bcryptjs
+
+## 🎨 UI/UX Features
+
+- **Modern Design** with glassmorphism effects
+- **Smooth Animations** and transitions
+- **Responsive Layout** for all screen sizes
+- **Dark Mode Support** (coming soon)
+- **Accessibility** compliant design
+- **Loading States** and error handling
+
+## 🔄 Development
+
+### Available Scripts
+
+#### Backend
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production
-npm start           # Start production server
-npm run prisma:migrate  # Run database migrations
-npm run prisma:studio   # Open Prisma Studio
+npm run start        # Start production server
+npm run prisma:studio # Open Prisma Studio
 ```
 
-### Frontend Commands
+#### Frontend
 ```bash
-npm start           # Start development server
-npm run build       # Build for production
-npm test           # Run tests
+npm start            # Start development server
+npm run build        # Build for production
+npm test             # Run tests
 ```
 
-## Deployment
-
-### Backend Deployment
-1. Set up a PostgreSQL database
-2. Configure environment variables for production
-3. Run `npm run build`
-4. Start with `npm start`
-
-### Frontend Deployment
-1. Set `REACT_APP_API_URL` to your backend URL
-2. Run `npm run build`
-3. Serve the `build` folder with a static file server
-
-## Security Considerations
-
-- Change JWT secret in production
-- Use environment variables for sensitive data
-- Implement rate limiting for API endpoints
-- Validate and sanitize all user inputs
-- Use HTTPS in production
-
-## Known Limitations
-
-- Only supports Amazon product URLs
-- Web scraping may be affected by Amazon's anti-bot measures
-- Email notifications require SMTP configuration
-- Price checking frequency is limited to avoid overloading Amazon
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -241,17 +196,27 @@ npm test           # Run tests
 4. Add tests if applicable
 5. Submit a pull request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🙏 Acknowledgments
 
-For issues and questions:
-- Check the GitHub Issues page
-- Review the documentation
-- Contact the development team
+- **Amazon** for product data
+- **Railway** for backend hosting
+- **Vercel** for frontend hosting
+- **Heroicons** for beautiful icons
+- **Tailwind CSS** for styling system
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+
+1. Check the [DEPLOYMENT.md](DEPLOYMENT.md) guide
+2. Review the troubleshooting section
+3. Open an issue on GitHub
+4. Check logs in Railway/Vercel dashboards
 
 ---
 
-Happy price tracking! 🛒💰
+**Built with ❤️ for smart shoppers everywhere!**

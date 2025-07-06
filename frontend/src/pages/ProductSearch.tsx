@@ -116,16 +116,16 @@ const ProductSearch: React.FC = () => {
   };
 
   // Debug function to log current sessionStorage state (for development)
-  const debugSearchState = () => {
-    try {
-      const state = sessionStorage.getItem(SEARCH_STATE_KEY);
-      const results = sessionStorage.getItem(SEARCH_RESULTS_KEY);
-      console.log('🔍 Current search state:', state ? JSON.parse(state) : null);
-      console.log('📦 Current search results:', results ? 'Available' : 'None');
-    } catch (error) {
-      console.warn('Failed to debug search state:', error);
-    }
-  };
+  // const debugSearchState = () => {
+  //   try {
+  //     const state = sessionStorage.getItem(SEARCH_STATE_KEY);
+  //     const results = sessionStorage.getItem(SEARCH_RESULTS_KEY);
+  //     console.log('🔍 Current search state:', state ? JSON.parse(state) : null);
+  //     console.log('📦 Current search results:', results ? 'Available' : 'None');
+  //   } catch (error) {
+  //     console.warn('Failed to debug search state:', error);
+  //   }
+  // };
 
   // Clear search and reset state
   const handleClearSearch = () => {
