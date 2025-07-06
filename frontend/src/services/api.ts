@@ -6,6 +6,12 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api
 console.log('🔗 API Base URL:', API_BASE_URL);
 console.log('🔗 Environment:', process.env.NODE_ENV);
 console.log('🔗 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('🔗 Current Origin:', window.location.origin);
+
+// Validate the API URL format
+if (API_BASE_URL && !API_BASE_URL.startsWith('http')) {
+  console.error('❌ INVALID API URL: Must start with http:// or https://', API_BASE_URL);
+}
 
 // Create axios instance
 const api = axios.create({
@@ -22,6 +28,21 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Debug: Log the full request URL
+    const fullUrl = (config.baseURL || '') + (config.url || '');
+    console.log('🚀 API Request:', {
+      method: config.method?.toUpperCase(),
+      endpoint: config.url,
+      baseURL: config.baseURL,
+      fullURL: fullUrl
+    });
+    
+    // Validate URL format
+    if (!fullUrl.startsWith('https://pricetracker-production-f9e3.up.railway.app')) {
+      console.error('❌ WRONG API URL! Expected Railway URL, got:', fullUrl);
+    }
+    
     return config;
   },
   (error) => {
