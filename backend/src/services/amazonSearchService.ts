@@ -349,10 +349,17 @@ export class AmazonSearchService {
         }
       }
 
+      // If we couldn't get totalResults from scraping, estimate based on products found
+      if (totalResults === 0 && products.length > 0) {
+        // Estimate total results - if we found products, there are likely more pages
+        totalResults = Math.max(products.length * 5, 100); // Conservative estimate
+      }
+
       console.log(`✅ Successfully extracted ${products.length} products out of ${productElements.length} elements`);
+      console.log(`📊 Total results estimated: ${totalResults}`);
 
       return {
-        products: products.slice(0, 20), // Limit to 20 products per page
+        products: products, // Return all scraped products
         totalResults,
         searchTerm: query
       };

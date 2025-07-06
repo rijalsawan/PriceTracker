@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ProductCard from '../components/ProductCard';
+import AddProductModal from '../components/AddProductModal';
 import { Product, productsAPI } from '../services/api';
 import { PlusIcon, MagnifyingGlassIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
@@ -9,6 +10,7 @@ import toast from 'react-hot-toast';
 const Dashboard: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,7 +81,7 @@ const Dashboard: React.FC = () => {
               </div>
               
               <button
-                onClick={() => navigate('/search')}
+                onClick={() => setShowAddModal(true)}
                 className="inline-flex items-center max-sm:w-1/2 max-sm:mx-auto max-sm: my-4 justify-center px-6 py-3 bg-slate-900 text-white font-medium rounded-2xl hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-slate-900/25 group"
               >
                 <PlusIcon className="h-5 w-5 mr-2  group-hover:scale-110 transition-transform" />
@@ -104,7 +106,7 @@ const Dashboard: React.FC = () => {
                   Add Amazon products to your watchlist and get notified when prices drop to your target.
                 </p>
                 <button
-                  onClick={() => navigate('/search')}
+                  onClick={() => setShowAddModal(true)}
                   className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-medium rounded-2xl hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-slate-900/25 group"
                 >
                   <PlusIcon className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
@@ -134,6 +136,13 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Add Product Modal */}
+      <AddProductModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onProductAdded={fetchProducts}
+      />
     </Layout>
   );
 };
