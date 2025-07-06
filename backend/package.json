@@ -5,6 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
+    "start:railway": "npx prisma db push --accept-data-loss && node dist/server.js",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
     "postinstall": "prisma generate",

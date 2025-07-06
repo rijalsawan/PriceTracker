@@ -61,13 +61,33 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   
-  // Start price tracking service
+  // Test database connection and push schema if needed
+  try {
+    console.log('🔍 Testing database connection...');
+    await prisma.$connect();
+    console.log('✅ Database connected successfully');
+    
+    // Check if tables exist by trying a simple query
+    try {
+      await prisma.user.findFirst();
+      console.log('✅ Database tables exist');
+    } catch (error) {
+      console.log('⚠️ Database tables not found, they may need to be created');
+      console.log('💡 Run "npx prisma db push" to create tables');
+    }
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+  }
+  
+  // Start price tracking service (with delay to allow DB setup)
   if (process.env.NODE_ENV !== 'test') {
-    startPriceTracking();
+    setTimeout(() => {
+      startPriceTracking();
+    }, 5000); // Wait 5 seconds before starting price tracking
   }
 });
 
