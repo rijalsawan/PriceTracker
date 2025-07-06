@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "build": "tsc && prisma generate",
-    "deploy": "prisma db push && npm start",
+    "build": "tsc",
+    "postinstall": "prisma generate",
+    "deploy": "prisma db push --accept-data-loss",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
