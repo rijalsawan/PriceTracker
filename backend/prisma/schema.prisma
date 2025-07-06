@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  products Product[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  url         String   @unique
+  title       String
+  description String?
+  imageUrl    String?
+  currentPrice Float
+  targetPrice  Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  priceHistory PriceHistory[]
+  notifications Notification[]
+
+  @@map("products")
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  price     Float
+  timestamp DateTime @default(now())
+
+  // Relations
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("price_history")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  type      String   // PRICE_DROP, PRICE_INCREASE, TARGET_REACHED, ERROR
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}

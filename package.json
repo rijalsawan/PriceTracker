@@ -1,0 +1,38 @@
+{
+  "name": "amazon-price-tracker",
+  "version": "1.0.0",
+  "description": "A full-stack web application that tracks Amazon product prices and notifies users when prices drop",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "start": "npm start --prefix backend",
+    "prisma:generate": "npm run prisma:generate --prefix backend",
+    "prisma:migrate": "npm run prisma:migrate --prefix backend",
+    "prisma:studio": "npm run prisma:studio --prefix backend"
+  },
+  "keywords": [
+    "amazon",
+    "price",
+    "tracker",
+    "web-scraping",
+    "react",
+    "nodejs",
+    "postgresql",
+    "prisma"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}
