@@ -3,15 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ProductCard from '../components/ProductCard';
 import AddProductModal from '../components/AddProductModal';
+import NotificationTester from '../components/NotificationTester';
 import { Product, productsAPI } from '../services/api';
 import { PlusIcon, MagnifyingGlassIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import SEO from '../components/SEO';
+import { usePriceChangeDetection } from '../hooks/usePriceChangeDetection';
+import { useNotifications } from '../contexts/NotificationContext';
 
 const Dashboard: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const navigate = useNavigate();
+  const { removeProductNotifications } = useNotifications();
 
   useEffect(() => {
     fetchProducts();
@@ -42,7 +47,14 @@ const Dashboard: React.FC = () => {
 
   const handleProductDeleted = (productId: string) => {
     setProducts(prev => prev.filter(product => product.id !== productId));
+    // Remove notifications for this product
+    removeProductNotifications(productId);
+    // Stop tracking price changes for this product
+    removeProductFromTracking(productId);
   };
+
+  // Initialize price change detection
+  const { removeProductFromTracking } = usePriceChangeDetection({ products });
 
   if (isLoading) {
     return (
@@ -66,6 +78,12 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Dashboard - PriceTracker | Your Amazon Price Monitoring Hub"
+        description="View all your tracked Amazon products in one place. Monitor price changes, set alerts, and never miss a deal with your personalized dashboard."
+        keywords="price tracking dashboard, amazon price monitor, deal alerts, product tracking"
+        url="/dashboard"
+      />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           {/* Header Section */}
@@ -143,6 +161,9 @@ const Dashboard: React.FC = () => {
         onClose={() => setShowAddModal(false)}
         onProductAdded={fetchProducts}
       />
+
+      {/* Notification Tester (only in development) */}
+      {process.env.NODE_ENV === 'development' && <NotificationTester />}
     </Layout>
   );
 };

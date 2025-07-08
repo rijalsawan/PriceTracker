@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationPanel from './NotificationPanel';
 import { 
-  BellIcon, 
   UserIcon, 
   MagnifyingGlassIcon, 
   HomeIcon,
   Bars3Icon,
   XMarkIcon,
   ChartBarIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  BellIcon
 } from '@heroicons/react/24/outline';
 
 interface LayoutProps {
@@ -25,6 +26,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
     { name: 'Search Products', href: '/search', icon: MagnifyingGlassIcon },
+  ];
+
+  const mobileNavigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+    { name: 'Search Products', href: '/search', icon: MagnifyingGlassIcon },
+    { name: 'Notifications', href: '/notifications', icon: BellIcon },
   ];
 
   const closeMobileMenu = () => {
@@ -86,10 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Right side */}
             <div className="flex items-center space-x-4">
               {/* Notifications */}
-              <button className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all">
-                <BellIcon className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-              </button>
+              <NotificationPanel />
 
               {/* User Menu */}
               <div className="hidden md:flex items-center space-x-3 pl-4 border-l border-slate-200">
@@ -168,7 +172,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Menu Content */}
                 <div className="px-4 pt-6 pb-8 space-y-2 bg-slate-100">
-                  {navigation.map((item, index) => {
+                  {mobileNavigation.map((item, index) => {
                     const isActive = location.pathname === item.href;
                     return (
                       <Link

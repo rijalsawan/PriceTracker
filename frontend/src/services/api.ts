@@ -117,14 +117,18 @@ export interface PriceAnalysis {
 
 export interface Notification {
   id: string;
+  title: string;
   message: string;
-  type: 'PRICE_DROP' | 'PRICE_INCREASE' | 'TARGET_REACHED' | 'ERROR';
+  type: 'PRICE_DROP' | 'PRICE_INCREASE' | 'TARGET_REACHED' | 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
   isRead: boolean;
   createdAt: string;
+  updatedAt?: string;
   product?: {
     id: string;
     title: string;
     imageUrl?: string;
+    oldPrice?: number;
+    newPrice?: number;
   };
 }
 
@@ -201,9 +205,11 @@ export const productsAPI = {
 // Notifications API
 export const notificationsAPI = {
   getAll: () => api.get('/notifications'),
+  create: (notification: Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>) => api.post('/notifications', notification),
   markAsRead: (id: string) => api.put(`/notifications/${id}/read`),
   markAllAsRead: () => api.put('/notifications/read-all'),
   delete: (id: string) => api.delete(`/notifications/${id}`),
+  deleteByProduct: (productId: string) => api.delete(`/notifications/product/${productId}`),
   getUnreadCount: () => api.get('/notifications/unread-count'),
 };
 

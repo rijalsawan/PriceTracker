@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import SEO from '../components/SEO';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +25,14 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <SEO
+        title="Sign In - PriceTracker | Access Your Price Tracking Dashboard"
+        description="Sign in to your PriceTracker account and access your personalized price tracking dashboard. Monitor Amazon prices and get instant deal alerts."
+        keywords="login, signin, price tracker login, amazon price monitoring dashboard"
+        url="/login"
+      />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -85,7 +93,7 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <div>
+          <div className='flex flex-col gap-4'>
             <button
               type="submit"
               disabled={isLoading}
@@ -99,6 +107,16 @@ const Login: React.FC = () => {
               ) : (
                 'Sign in'
               )}
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative bg-green-500 w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Link to="/" className="w-full text-center">
+                Back to Homepage
+              </Link>
+
             </button>
           </div>
 
@@ -116,6 +134,7 @@ const Login: React.FC = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

@@ -19,6 +19,7 @@ interface AddProductModalProps {
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onProductAdded }) => {
   const [selectedMethod, setSelectedMethod] = useState<'search' | 'url' | null>(null);
   const [amazonUrl, setAmazonUrl] = useState('');
+  const [targetPrice, setTargetPrice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -27,6 +28,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onPr
     if (isOpen) {
       setSelectedMethod(null);
       setAmazonUrl('');
+      setTargetPrice('');
     }
   }, [isOpen]);
 
@@ -90,7 +92,11 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onPr
     setIsLoading(true);
 
     try {
-      const response = await productsAPI.add({ asin });
+      const targetPriceNum = targetPrice ? parseFloat(targetPrice) : undefined;
+      const response = await productsAPI.add({ 
+        asin, 
+        targetPrice: targetPriceNum && targetPriceNum > 0 ? targetPriceNum : undefined 
+      });
       if (response.data) {
         toast.success('Product added to tracking list successfully!');
         onProductAdded?.();
@@ -283,6 +289,30 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, onPr
                       />
                       <p className="text-xs text-slate-400 px-1">
                         We'll automatically extract the product information
+                      </p>
+                    </div>
+
+                    {/* Target Price Input */}
+                    <div className="space-y-2">
+                      <label htmlFor="target-price" className="block text-sm font-medium text-slate-700">
+                        Target Price (Optional)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
+                        <input
+                          id="target-price"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={targetPrice}
+                          onChange={(e) => setTargetPrice(e.target.value)}
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-4 bg-slate-50/50 border border-slate-200/50 hover:border-slate-300/70 focus:border-blue-400 focus:bg-white/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-400/10 transition-all duration-300"
+                          disabled={isLoading}
+                        />
+                      </div>
+                      <p className="text-xs text-slate-400 px-1">
+                        We'll notify you when the price drops to or below this amount
                       </p>
                     </div>
 

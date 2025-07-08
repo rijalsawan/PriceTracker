@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import SEO from '../components/SEO';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -72,7 +73,14 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <SEO
+        title="Create Account - PriceTracker | Start Tracking Amazon Prices"
+        description="Join thousands of savvy shoppers! Create your free PriceTracker account and start monitoring Amazon prices. Get instant alerts when prices drop."
+        keywords="amazon price tracker signup, create account, register, price monitoring, deal alerts"
+        url="/register"
+      />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -193,7 +201,7 @@ const Register: React.FC = () => {
             </div>
           </div>
 
-          <div>
+          <div className="flex flex-col gap-4">
             <button
               type="submit"
               disabled={isLoading}
@@ -207,6 +215,15 @@ const Register: React.FC = () => {
               ) : (
                 'Create account'
               )}
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group bg-green-500 relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Link to="/" className="w-full text-center">
+                Back to Homepage
+              </Link>
             </button>
           </div>
 
@@ -224,6 +241,7 @@ const Register: React.FC = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,12 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import NotificationContainer from './components/NotificationContainer';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProductDetail from './pages/ProductDetail';
 import ProductSearch from './pages/ProductSearch';
+import NotificationsPage from './pages/Notifications';
 import LoadingSpinner from './components/LoadingSpinner';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -39,10 +44,13 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <Routes>
+    <HelmetProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-50">
+            <Routes>
+            <Route path="/" element={<Home />} />
             <Route
               path="/login"
               element={
@@ -83,7 +91,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster
             position="top-right"
@@ -109,9 +125,12 @@ function App() {
               },
             }}
           />
+          <NotificationContainer />
         </div>
       </Router>
+      </NotificationProvider>
     </AuthProvider>
+    </HelmetProvider>
   );
 }
 

@@ -2,29 +2,59 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
+    
+    <!-- Favicons -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+    
+    <!-- Viewport and mobile optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#059669" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Track Amazon prices and get instant alerts when prices drop. Never miss a deal again with PriceTracker - the ultimate Amazon price monitoring tool." />
+    <meta name="keywords" content="amazon price tracker, price alerts, deal finder, price monitoring, amazon deals, price drop alerts, shopping assistant" />
+    <meta name="author" content="PriceTracker" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://price-tracker-murex.vercel.app/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://price-tracker-murex.vercel.app/" />
+    <meta property="og:title" content="PriceTracker - Amazon Price Tracking & Alerts" />
+    <meta property="og:description" content="Track Amazon prices and get instant alerts when prices drop. Never miss a deal again!" />
+    <meta property="og:image" content="https://price-tracker-murex.vercel.app/logo512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="PriceTracker" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://price-tracker-murex.vercel.app/" />
+    <meta property="twitter:title" content="PriceTracker - Amazon Price Tracking & Alerts" />
+    <meta property="twitter:description" content="Track Amazon prices and get instant alerts when prices drop. Never miss a deal again!" />
+    <meta property="twitter:image" content="https://price-tracker-murex.vercel.app/logo512.png" />
+    <meta property="twitter:creator" content="@PriceTracker" />
+    
+    <!-- Progressive Web App -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Additional SEO -->
+    <meta name="application-name" content="PriceTracker" />
+    <meta name="apple-mobile-web-app-title" content="PriceTracker" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-TileColor" content="#059669" />
+    <meta name="msapplication-config" content="%PUBLIC_URL%/browserconfig.xml" />
+    
+    <title>PriceTracker - Amazon Price Tracking & Alerts | Never Miss a Deal</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

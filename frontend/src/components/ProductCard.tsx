@@ -11,6 +11,7 @@ import {
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import EditTargetModal from './EditTargetModal';
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditTargetModalOpen, setIsEditTargetModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -114,7 +116,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
               {isMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 z-20">
                   <div className="py-2">
-                    
+                    <button
+                      onClick={() => {
+                        setIsEditTargetModalOpen(true);
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 w-full text-left transition-colors"
+                    >
+                      <PencilIcon className="h-4 w-4 mr-3" />
+                      Edit Target Price
+                    </button>
                     <a
                       href={product.url}
                       target="_blank"
@@ -200,7 +211,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
         </div>
       </div>
 
-      
+      {/* Edit Target Modal */}
+      <EditTargetModal
+        isOpen={isEditTargetModalOpen}
+        onClose={() => setIsEditTargetModalOpen(false)}
+        product={product}
+        onUpdate={onUpdate}
+      />
     </>
   );
 };
