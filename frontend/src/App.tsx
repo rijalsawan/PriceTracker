@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import NotificationContainer from './components/NotificationContainer';
@@ -44,11 +43,10 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 function App() {
   return (
-    <HelmetProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-50">
+    <AuthProvider>
+      <NotificationProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
             <Routes>
             <Route path="/" element={<Home />} />
             <Route
@@ -130,7 +128,6 @@ function App() {
       </Router>
       </NotificationProvider>
     </AuthProvider>
-    </HelmetProvider>
   );
 }
 

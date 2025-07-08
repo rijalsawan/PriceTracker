@@ -1,5 +1,4 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import React, { useEffect } from 'react';
 
 interface SEOProps {
   title?: string;
@@ -24,79 +23,109 @@ const SEO: React.FC<SEOProps> = ({
   publishedTime,
   modifiedTime
 }) => {
-  const siteUrl = 'https://price-tracker-murex.vercel.app';
-  const fullUrl = url.startsWith('http') ? url : `${siteUrl}${url}`;
-  const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
+  useEffect(() => {
+    const siteUrl = 'https://price-tracker-murex.vercel.app';
+    const fullUrl = url.startsWith('http') ? url : `${siteUrl}${url}`;
+    const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
-  return (
-    <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="author" content={author} />
-      <link rel="canonical" href={fullUrl} />
+    // Set document title
+    document.title = title;
 
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImage} />
-      <meta property="og:image:width" content="512" />
-      <meta property="og:image:height" content="512" />
-      <meta property="og:locale" content="en_US" />
-      <meta property="og:site_name" content="PriceTracker" />
+    // Helper function to update meta tags
+    const updateMetaTag = (name: string, content: string, property?: boolean) => {
+      const attribute = property ? 'property' : 'name';
+      let element = document.querySelector(`meta[${attribute}="${name}"]`);
       
-      {/* Article specific meta tags */}
-      {type === 'article' && publishedTime && (
-        <meta property="article:published_time" content={publishedTime} />
-      )}
-      {type === 'article' && modifiedTime && (
-        <meta property="article:modified_time" content={modifiedTime} />
-      )}
-      {type === 'article' && author && (
-        <meta property="article:author" content={author} />
-      )}
-
-      {/* Twitter */}
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={fullUrl} />
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={fullImage} />
-      <meta property="twitter:creator" content="@PriceTracker" />
-
-      {/* Additional SEO */}
-      <meta name="robots" content="index, follow" />
-      <meta name="googlebot" content="index, follow" />
-      <meta name="format-detection" content="telephone=no" />
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, name);
+        document.head.appendChild(element);
+      }
       
-      {/* JSON-LD Structured Data */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'WebApplication',
-          name: 'PriceTracker',
-          description: description,
-          url: fullUrl,
-          applicationCategory: 'ShoppingApplication',
-          operatingSystem: 'All',
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD'
-          },
-          author: {
-            '@type': 'Organization',
-            name: 'PriceTracker'
-          },
-          image: fullImage,
-          screenshot: fullImage
-        })}
-      </script>
-    </Helmet>
-  );
+      element.setAttribute('content', content);
+    };
+
+    // Basic Meta Tags
+    updateMetaTag('description', description);
+    updateMetaTag('keywords', keywords);
+    updateMetaTag('author', author);
+    updateMetaTag('robots', 'index, follow');
+    updateMetaTag('googlebot', 'index, follow');
+    updateMetaTag('format-detection', 'telephone=no');
+
+    // Open Graph / Facebook
+    updateMetaTag('og:type', type, true);
+    updateMetaTag('og:url', fullUrl, true);
+    updateMetaTag('og:title', title, true);
+    updateMetaTag('og:description', description, true);
+    updateMetaTag('og:image', fullImage, true);
+    updateMetaTag('og:image:width', '512', true);
+    updateMetaTag('og:image:height', '512', true);
+    updateMetaTag('og:locale', 'en_US', true);
+    updateMetaTag('og:site_name', 'PriceTracker', true);
+
+    // Article specific meta tags
+    if (type === 'article' && publishedTime) {
+      updateMetaTag('article:published_time', publishedTime, true);
+    }
+    if (type === 'article' && modifiedTime) {
+      updateMetaTag('article:modified_time', modifiedTime, true);
+    }
+    if (type === 'article' && author) {
+      updateMetaTag('article:author', author, true);
+    }
+
+    // Twitter
+    updateMetaTag('twitter:card', 'summary_large_image', true);
+    updateMetaTag('twitter:url', fullUrl, true);
+    updateMetaTag('twitter:title', title, true);
+    updateMetaTag('twitter:description', description, true);
+    updateMetaTag('twitter:image', fullImage, true);
+    updateMetaTag('twitter:creator', '@PriceTracker', true);
+
+    // Canonical URL
+    let canonicalElement = document.querySelector('link[rel="canonical"]');
+    if (!canonicalElement) {
+      canonicalElement = document.createElement('link');
+      canonicalElement.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalElement);
+    }
+    canonicalElement.setAttribute('href', fullUrl);
+
+    // JSON-LD Structured Data
+    let jsonLdElement = document.querySelector('script[type="application/ld+json"]');
+    if (!jsonLdElement) {
+      jsonLdElement = document.createElement('script');
+      jsonLdElement.setAttribute('type', 'application/ld+json');
+      document.head.appendChild(jsonLdElement);
+    }
+    
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'PriceTracker',
+      description: description,
+      url: fullUrl,
+      applicationCategory: 'ShoppingApplication',
+      operatingSystem: 'All',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD'
+      },
+      author: {
+        '@type': 'Organization',
+        name: 'PriceTracker'
+      },
+      image: fullImage,
+      screenshot: fullImage
+    };
+    
+    jsonLdElement.textContent = JSON.stringify(structuredData);
+
+  }, [title, description, keywords, image, url, type, author, publishedTime, modifiedTime]);
+
+  return null;
 };
 
 export default SEO;
