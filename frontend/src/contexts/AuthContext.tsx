@@ -36,8 +36,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (token && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
-          // Verify token is still valid
-          await authAPI.getMe();
+          
+          // Only verify token if not on auth pages to prevent redirect loops
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/login' && currentPath !== '/signup' && currentPath !== '/register') {
+            // Verify token is still valid
+            await authAPI.getMe();
+          }
         } catch (error) {
           // Token is invalid, clear auth data
           localStorage.removeItem('authToken');

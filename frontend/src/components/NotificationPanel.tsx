@@ -77,8 +77,6 @@ const NotificationPanel: React.FC = () => {
         return '🎉';
       case 'PRICE_INCREASE':
         return '📈';
-      case 'TARGET_REACHED':
-        return '🎯';
       default:
         return '📝';
     }

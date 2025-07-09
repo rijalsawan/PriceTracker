@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Product, PriceHistory, PriceAnalysis, productsAPI } from '../services/api';
 import Layout from '../components/Layout';
+import PriceChart from '../components/PriceChart';
 import { 
   ArrowLeftIcon, 
   ArrowTopRightOnSquareIcon,
@@ -16,7 +17,6 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import EditProductModal from '../components/EditProductModal';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +24,6 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [priceHistory, setPriceHistory] = useState<PriceHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [isRemovingProduct, setIsRemovingProduct] = useState(false);
   const [isCheckingPrice, setIsCheckingPrice] = useState(false);
@@ -72,7 +71,6 @@ const ProductDetail: React.FC = () => {
 
   const handleProductUpdate = (updatedProduct: Product) => {
     setProduct(updatedProduct);
-    setIsEditModalOpen(false);
   };
 
   const handleAddToTracking = async () => {
@@ -207,150 +205,6 @@ const ProductDetail: React.FC = () => {
     return { change, percentChange };
   };
 
-  // Simple price history display component
-  const PriceHistoryDisplay = ({ history }: { history: PriceHistory[] }) => {
-    console.log('PriceHistoryDisplay received history:', history);
-    
-    if (!history || history.length === 0) {
-      return (
-        <div className="text-center py-12">
-          <ChartBarIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No price history yet</h3>
-          <p className="text-sm text-gray-500">
-            Price tracking starts when you add the product
-          </p>
-        </div>
-      );
-    }
-
-    const formatDate = (dateString: string) => {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
-      });
-    };
-
-    const maxPrice = Math.max(...history.map(h => h.price));
-    const minPrice = Math.min(...history.map(h => h.price));
-
-    // Debug logging
-    console.log('Price History Display Data:', {
-      historyLength: history.length,
-      maxPrice,
-      minPrice,
-      firstFewEntries: history.slice(0, 3).map(h => ({ price: h.price, timestamp: h.timestamp }))
-    });
-
-    return (
-      <div className="space-y-6">
-        {/* Simple Bar Chart */}
-        <div className="relative h-32 bg-gray-50 rounded-lg p-4">
-          <div className="flex items-end justify-between h-full">
-            {history.slice(0, 10).reverse().map((entry, index) => {
-              // More robust height calculation
-              let height = 50; // Default height
-              if (maxPrice > minPrice) {
-                height = ((entry.price - minPrice) / (maxPrice - minPrice)) * 70 + 20;
-              } else if (history.length === 1) {
-                height = 60; // Single entry gets good height
-              }
-              
-              console.log(`Bar ${index}: price=${entry.price}, calculated height=${height}%`);
-              
-              const isLatest = index === history.slice(0, 10).reverse().length - 1;
-              const isLowest = entry.price === minPrice;
-              const isHighest = entry.price === maxPrice;
-              
-              return (
-                <div
-                  key={entry.id || index}
-                  className="flex-1 flex justify-center items-end relative group"
-                >
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
-                    <div className="font-semibold">${entry.price.toFixed(2)}</div>
-                    <div className="text-gray-300">{formatDate(entry.timestamp)}</div>
-                    {isLatest && <div className="text-blue-300">Latest Price</div>}
-                    {isLowest && <div className="text-green-300">Lowest Price</div>}
-                    {isHighest && <div className="text-red-300">Highest Price</div>}
-                    {/* Arrow pointing down */}
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-900"></div>
-                  </div>
-                  
-                  {/* Bar */}
-                  <div
-                    className={`w-4 rounded-t transition-all duration-300 border cursor-pointer ${
-                      isLatest 
-                        ? 'bg-blue-600 border-blue-700 group-hover:bg-blue-700' 
-                        : isLowest
-                        ? 'bg-green-500 border-green-600 group-hover:bg-green-600'
-                        : isHighest
-                        ? 'bg-red-500 border-red-600 group-hover:bg-red-600'
-                        : 'bg-blue-400 border-blue-500 group-hover:bg-blue-500'
-                    }`}
-                    style={{ 
-                      height: `${Math.max(height, 15)}%`, 
-                      minHeight: '12px'
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Price Range Display */}
-        <div className="flex justify-between text-xs text-gray-500 px-2">
-          <span>Min: ${minPrice.toFixed(2)}</span>
-          <span>Max: ${maxPrice.toFixed(2)}</span>
-        </div>
-
-        {/* Chart Legend */}
-        <div className="flex justify-center space-x-4 text-xs text-gray-600">
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-blue-600 rounded"></div>
-            <span>Latest</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span>Lowest</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span>Highest</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-blue-400 rounded"></div>
-            <span>Other</span>
-          </div>
-        </div>
-
-        {/* Current Price */}
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            ${history[0]?.price.toFixed(2)}
-          </div>
-          <div className="text-sm text-gray-500">Current Price</div>
-        </div>
-
-        {/* Recent Price History */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-900">Recent History</h4>
-          {history.slice(0, 5).map((entry, index) => (
-            <div key={entry.id || index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
-              <div className="text-sm text-gray-900">
-                ${entry.price.toFixed(2)}
-              </div>
-              <div className="text-xs text-gray-500">
-                {formatDate(entry.timestamp)}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   if (isLoading) {
     return (
       <Layout>
@@ -381,7 +235,6 @@ const ProductDetail: React.FC = () => {
 
   const priceStats = getPriceStats();
   const recentChange = getRecentPriceChange();
-  const isTargetReached = product.targetPrice && product.currentPrice <= product.targetPrice;
 
   return (
     <Layout>
@@ -521,33 +374,27 @@ const ProductDetail: React.FC = () => {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {/* Price Chart */}
             <div className="xl:col-span-2">
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/20">
-                <div className="p-6 sm:p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold text-slate-900">Price History</h3>
-                    <div className="flex items-center text-sm text-slate-500">
-                      <ChartBarIcon className="h-4 w-4 mr-1" />
-                      {priceHistory.length} records
+              {product.isTracked ? (
+                <PriceChart 
+                  data={priceHistory} 
+                  currentPrice={product.currentPrice}
+                  productTitle={product.title}
+                />
+              ) : (
+                <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/20 p-8">
+                  <div className="text-center py-16">
+                    <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto mb-4">
+                      <ChartBarIcon className="h-12 w-12 text-slate-400" />
                     </div>
+                    <h3 className="text-lg font-medium text-slate-900 mb-2">
+                      Start tracking to see price history
+                    </h3>
+                    <p className="text-slate-500 max-w-sm mx-auto">
+                      Add this product to your tracking list to monitor price changes over time.
+                    </p>
                   </div>
-                  
-                  {product.isTracked ? (
-                    <PriceHistoryDisplay history={priceHistory} />
-                  ) : (
-                    <div className="text-center py-16">
-                      <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto mb-4">
-                        <ChartBarIcon className="h-12 w-12 text-slate-400" />
-                      </div>
-                      <h3 className="text-lg font-medium text-slate-900 mb-2">
-                        Start tracking to see price history
-                      </h3>
-                      <p className="text-slate-500 max-w-sm mx-auto">
-                        Add this product to your tracking list to monitor price changes over time.
-                      </p>
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Price Info Sidebar */}
@@ -577,21 +424,7 @@ const ProductDetail: React.FC = () => {
                   )}
                 </div>
 
-                {product.targetPrice && (
-                  <div className="mt-6 pt-6 border-t border-slate-200">
-                    <div className="text-center">
-                      <div className="text-2xl font-semibold text-blue-600 mb-1">
-                        ${product.targetPrice.toFixed(2)}
-                      </div>
-                      <div className="text-slate-500 text-sm mb-3">Target Price</div>
-                      {isTargetReached && (
-                        <div className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
-                          🎯 Target Reached!
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                {/* Target Price section removed */}
               </div>
 
               {/* Price Statistics */}
@@ -623,16 +456,6 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Edit Product Modal - Only show for tracked products */}
-        {product.isTracked && (
-          <EditProductModal
-            isOpen={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            product={product}
-            onUpdate={handleProductUpdate}
-          />
-        )}
       </div>
     </Layout>
   );

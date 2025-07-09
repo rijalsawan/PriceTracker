@@ -118,22 +118,6 @@ class BrowserNotificationService {
       data: { url: product.url || '/dashboard' }
     });
   }
-
-  public showTargetPriceReachedNotification(product: {
-    title: string;
-    targetPrice: number;
-    currentPrice: number;
-    image?: string;
-    url?: string;
-  }): void {
-    this.showNotification(`🎯 Target Price Reached!`, {
-      body: `${product.title}\nTarget: $${product.targetPrice.toFixed(2)}\nCurrent: $${product.currentPrice.toFixed(2)}\nTime to buy!`,
-      icon: product.image || '/favicon.svg',
-      tag: `target-reached-${product.title}`,
-      data: { url: product.url || '/dashboard' },
-      requireInteraction: true
-    });
-  }
 }
 
 export default BrowserNotificationService;

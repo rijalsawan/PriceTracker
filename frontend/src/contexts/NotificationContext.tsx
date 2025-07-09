@@ -4,7 +4,7 @@ import BrowserNotificationService from '../services/browserNotifications';
 
 interface InAppNotification {
   id: string;
-  type: 'PRICE_DROP' | 'PRICE_INCREASE' | 'TARGET_REACHED' | 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+  type: 'PRICE_DROP' | 'PRICE_INCREASE' | 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
   title: string;
   message: string;
   timestamp: Date;
@@ -245,33 +245,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         browserNotifications.showPriceDropNotification(productData);
       }
 
-      // Check if target price reached
-      if (product.targetPrice && newPrice <= product.targetPrice) {
-        setTimeout(() => {
-          addNotification({
-            type: 'TARGET_REACHED',
-            title: '🎯 Target Price Reached!',
-            message: `${product.title} is now at or below your target price of $${product.targetPrice.toFixed(2)}!`,
-            product: {
-              id: product.id,
-              title: product.title,
-              imageUrl: product.imageUrl,
-              oldPrice,
-              newPrice
-            }
-          });
-
-          if (hasBrowserPermission) {
-            browserNotifications.showTargetPriceReachedNotification({
-              title: product.title,
-              targetPrice: product.targetPrice,
-              currentPrice: newPrice,
-              image: product.imageUrl,
-              url: `/products/${product.id}`
-            });
-          }
-        }, 1000);
-      }
+      // Target price functionality removed
+      
     } else if (isPriceIncrease) {
       const increase = newPrice - oldPrice;
       const percentage = ((increase / oldPrice) * 100).toFixed(1);

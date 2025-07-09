@@ -93,17 +93,23 @@ const checkProductPrice = async (product: any) => {
       data: { currentPrice }
     });
 
-    // Add to price history
-    await prisma.priceHistory.create({
-      data: {
-        price: currentPrice,
-        productId: product.id
-      }
-    });
+    // Only add to price history if price has changed significantly (more than $0.01)
+    const priceDifference = Math.abs(currentPrice - previousPrice);
+    const significantChange = priceDifference > 0.01;
+
+    if (significantChange) {
+      // Add to price history only for significant changes
+      await prisma.priceHistory.create({
+        data: {
+          price: currentPrice,
+          productId: product.id
+        }
+      });
+    }
 
     // Check for price changes
-    const priceDifference = currentPrice - previousPrice;
-    const percentChange = ((priceDifference / previousPrice) * 100);
+    const priceChangeDifference = currentPrice - previousPrice;
+    const percentChange = ((priceChangeDifference / previousPrice) * 100);
 
     console.log(`💰 Price update: ${product.title} - $${previousPrice} → $${currentPrice} (${percentChange.toFixed(2)}%)`);
 
@@ -129,7 +135,7 @@ const checkProductPrice = async (product: any) => {
       console.log(`🎯 Target price reached for: ${product.title}`);
     }
     // Check for significant price drops (more than 5%)
-    else if (priceDifference < 0 && Math.abs(percentChange) > 5) {
+    else if (priceChangeDifference < 0 && Math.abs(percentChange) > 5) {
       const message = `📉 Price drop alert! ${product.title} dropped by ${Math.abs(percentChange).toFixed(2)}% to $${currentPrice}`;
       
       await createNotification(
@@ -150,7 +156,7 @@ const checkProductPrice = async (product: any) => {
       console.log(`📉 Significant price drop for: ${product.title}`);
     }
     // Check for significant price increases (more than 10%)
-    else if (priceDifference > 0 && percentChange > 10) {
+    else if (priceChangeDifference > 0 && percentChange > 10) {
       const message = `📈 Price increase alert! ${product.title} increased by ${percentChange.toFixed(2)}% to $${currentPrice}`;
       
       await createNotification(

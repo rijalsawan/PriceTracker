@@ -27,7 +27,6 @@ const NotificationTester: React.FC = () => {
     imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/71xb2xkN5qL._AC_SL1500_.jpg',
     url: 'https://amazon.com/dp/test123',
     currentPrice: 899.99,
-    targetPrice: 850.00,
     isActive: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -49,14 +48,6 @@ const NotificationTester: React.FC = () => {
       oldPrice: 899.99,
       newPrice: 999.99,
       icon: <ArrowTrendingUpIcon className="h-5 w-5 text-red-500" />
-    },
-    {
-      type: 'TARGET_REACHED' as const,
-      title: '🎯 Target Reached Test',
-      message: 'Test target price reached - iPhone is now at your target price of $850.00',
-      oldPrice: 899.99,
-      newPrice: 850.00,
-      icon: <BellIcon className="h-5 w-5 text-blue-500" />
     },
     {
       type: 'SUCCESS' as const,
@@ -99,20 +90,13 @@ const NotificationTester: React.FC = () => {
     });
   };
 
-  const handlePriceChangeTest = (type: 'drop' | 'increase' | 'target') => {
+  const handlePriceChangeTest = (type: 'drop' | 'increase') => {
     switch (type) {
       case 'drop':
         showPriceChangeNotification(mockProduct, 999.99, 899.99);
         break;
       case 'increase':
         showPriceChangeNotification(mockProduct, 899.99, 999.99);
-        break;
-      case 'target':
-        showPriceChangeNotification(
-          { ...mockProduct, targetPrice: 850.00 }, 
-          899.99, 
-          850.00
-        );
         break;
     }
   };
@@ -133,26 +117,14 @@ const NotificationTester: React.FC = () => {
       autoHide: false
     });
 
-    addNotification({
-      type: 'TARGET_REACHED',
-      title: '🎯 Target Reached for Test Product',
-      message: 'Test product target reached - this notification should be removed',
-      product: {
-        id: mockProduct.id,
-        title: mockProduct.title,
-        imageUrl: mockProduct.imageUrl,
-        oldPrice: 899.99,
-        newPrice: 850.00
-      },
-      autoHide: false
-    });
+    // Target reached notification removed
 
     // Show confirmation that notifications were added
     setTimeout(() => {
       addNotification({
         type: 'INFO',
         title: 'ℹ️ Test Notifications Added',
-        message: 'Added 2 notifications for test product. Click "Remove Test Product Notifications" to test removal.',
+        message: 'Added 1 notification for test product. Click "Remove Test Product Notifications" to test removal.',
         autoHide: true,
         duration: 5000
       });
@@ -272,12 +244,6 @@ const NotificationTester: React.FC = () => {
               className="w-full text-left text-sm text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-3 rounded transition-colors"
             >
               📈 Test Price Increase ($899 → $999)
-            </button>
-            <button
-              onClick={() => handlePriceChangeTest('target')}
-              className="w-full text-left text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 py-2 px-3 rounded transition-colors"
-            >
-              🎯 Test Target Reached ($899 → $850)
             </button>
           </div>
         </div>

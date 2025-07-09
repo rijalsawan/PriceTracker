@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
-import NotificationContainer from './components/NotificationContainer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -123,7 +122,6 @@ function App() {
               },
             }}
           />
-          <NotificationContainer />
         </div>
       </Router>
       </NotificationProvider>

@@ -38,7 +38,6 @@ interface EnhancedPriceChartProps {
   productId: string;
   productUrl: string;
   currentPrice: number;
-  targetPrice?: number;
   localPriceHistory?: Array<{
     timestamp: string;
     price: number;
@@ -49,7 +48,6 @@ const EnhancedPriceChart: React.FC<EnhancedPriceChartProps> = ({
   productId,
   productUrl,
   currentPrice,
-  targetPrice,
   localPriceHistory = []
 }) => {
   const [selectedPeriod, setSelectedPeriod] = useState<'1W' | '1M' | '3M' | '6M' | '1Y' | 'ALL'>('3M');
@@ -305,14 +303,6 @@ const EnhancedPriceChart: React.FC<EnhancedPriceChartProps> = ({
                 dot={filteredData.length > 20 ? false : { fill: '#3b82f6', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, fill: '#3b82f6' }}
               />
-              {targetPrice && (
-                <ReferenceLine 
-                  y={targetPrice} 
-                  stroke="#22c55e" 
-                  strokeDasharray="5 5"
-                  label={{ value: `Target: $${targetPrice.toFixed(2)}`, position: "top" }}
-                />
-              )}
             </LineChart>
           </ResponsiveContainer>
         ) : (

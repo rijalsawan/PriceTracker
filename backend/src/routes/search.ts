@@ -8,7 +8,7 @@ const router = Router();
 // Validation schemas
 const searchSchema = z.object({
   query: z.string().min(1).max(200),
-  page: z.number().min(1).max(10).optional().default(1),
+  page: z.number().min(1).max(50).optional().default(1), // Increased from 10 to 50
 });
 
 const suggestionSchema = z.object({

@@ -2,16 +2,6 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Debug: Log the API URL being used
-console.log('🔗 API Base URL:', API_BASE_URL);
-console.log('🔗 Environment:', process.env.NODE_ENV);
-console.log('🔗 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-console.log('🔗 Current Origin:', window.location.origin);
-
-// Validate the API URL format
-if (API_BASE_URL && !API_BASE_URL.startsWith('http')) {
-  console.error('❌ INVALID API URL: Must start with http:// or https://', API_BASE_URL);
-}
 
 // Create axios instance
 const api = axios.create({
@@ -22,33 +12,16 @@ const api = axios.create({
 });
 
 // Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    // Debug: Log the full request URL
-    const fullUrl = (config.baseURL || '') + (config.url || '');
-    console.log('🚀 API Request:', {
-      method: config.method?.toUpperCase(),
-      endpoint: config.url,
-      baseURL: config.baseURL,
-      fullURL: fullUrl
-    });
-    
-    // Validate URL format
-    if (!fullUrl.startsWith('https://pricetracker-production-f9e3.up.railway.app')) {
-      console.error('❌ WRONG API URL! Expected Railway URL, got:', fullUrl);
-    }
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
-);
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
@@ -57,7 +30,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // Only redirect if not already on login/signup page
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/signup' && currentPath !== '/register') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -80,7 +58,6 @@ export interface Product {
   description?: string;
   imageUrl?: string;
   currentPrice: number;
-  targetPrice?: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -119,7 +96,7 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'PRICE_DROP' | 'PRICE_INCREASE' | 'TARGET_REACHED' | 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+  type: 'PRICE_DROP' | 'PRICE_INCREASE' | 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
   isRead: boolean;
   createdAt: string;
   updatedAt?: string;
@@ -146,11 +123,9 @@ export interface RegisterData {
 
 export interface AddProductData {
   asin: string;
-  targetPrice?: number;
 }
 
 export interface UpdateProductData {
-  targetPrice?: number;
   isActive?: boolean;
 }
 

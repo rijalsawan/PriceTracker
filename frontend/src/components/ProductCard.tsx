@@ -4,14 +4,12 @@ import { Product, productsAPI } from '../services/api';
 import { 
   EllipsisVerticalIcon, 
   ArrowTopRightOnSquareIcon,
-  PencilIcon,
   TrashIcon,
   ChartBarIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import EditTargetModal from './EditTargetModal';
 
 interface ProductCardProps {
   product: Product;
@@ -22,7 +20,6 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isEditTargetModalOpen, setIsEditTargetModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -79,8 +76,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
     );
   };
 
-  const isTargetReached = product.targetPrice && product.currentPrice <= product.targetPrice;
-
   return (
     <>
       <div className="group bg-white/70 backdrop-blur-sm rounded-3xl border border-slate-200/50 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300 overflow-hidden">
@@ -116,16 +111,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
               {isMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 z-20">
                   <div className="py-2">
-                    <button
-                      onClick={() => {
-                        setIsEditTargetModalOpen(true);
-                        setIsMenuOpen(false);
-                      }}
-                      className="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 w-full text-left transition-colors"
-                    >
-                      <PencilIcon className="h-4 w-4 mr-3" />
-                      Edit Target Price
-                    </button>
                     <a
                       href={product.url}
                       target="_blank"
@@ -149,14 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
             </div>
           </div>
 
-          {/* Target reached badge */}
-          {isTargetReached && (
-            <div className="absolute top-6 left-6">
-              <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
-                🎯 Target Reached
-              </div>
-            </div>
-          )}
+          {/* Target reached badge - removed */}
         </div>
 
         {/* Product Info */}
@@ -180,11 +158,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
               {getPriceChangeIndicator()}
             </div>
             
-            {product.targetPrice && (
-              <div className="text-sm text-slate-600">
-                Target: <span className="font-semibold text-blue-600">${product.targetPrice.toFixed(2)}</span>
-              </div>
-            )}
+            {/* Target price section - removed */}
           </div>
 
           {/* Status and Actions */}
@@ -210,14 +184,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onUpdate, onDelete }
           </div>
         </div>
       </div>
-
-      {/* Edit Target Modal */}
-      <EditTargetModal
-        isOpen={isEditTargetModalOpen}
-        onClose={() => setIsEditTargetModalOpen(false)}
-        product={product}
-        onUpdate={onUpdate}
-      />
     </>
   );
 };

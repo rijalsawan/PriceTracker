@@ -12,59 +12,97 @@ import {
   DevicePhoneMobileIcon,
   ClockIcon,
   ShieldCheckIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  MagnifyingGlassIcon,
+  LinkIcon,
+  PlusIcon,
+  EyeIcon,
+  ChartPieIcon,
+  InformationCircleIcon,
+  PlayIcon
 } from '@heroicons/react/24/outline';
 import SEO from '../components/SEO';
 
 const Home: React.FC = () => {
   const features = [
     {
-      icon: ChartBarIcon,
-      title: 'Real-Time Price Tracking',
-      description: 'Monitor Amazon prices 24/7 with live updates and detailed historical charts to spot trends.',
+      icon: LinkIcon,
+      title: 'Easy Product Addition',
+      description: 'Simply paste any Amazon product URL and start tracking instantly. Our advanced scraper extracts all product details automatically.',
       color: 'text-blue-600'
     },
     {
-      icon: BellIcon,
-      title: 'Instant Smart Alerts',
-      description: 'Get lightning-fast notifications via email when prices drop below your target.',
+      icon: ChartPieIcon,
+      title: 'Real-Time Price Monitoring',
+      description: 'Monitor Amazon prices 24/7 with automatic checks. See live price changes, historical data, and price trend analysis.',
       color: 'text-green-600'
     },
     {
-      icon: ArrowTrendingDownIcon,
-      title: 'Deal Discovery',
-      description: 'Never miss a bargain with our intelligent price monitoring and deal detection.',
+      icon: BellIcon,
+      title: 'Instant Price Drop Alerts',
+      description: 'Get immediate notifications when prices drop significantly. Never miss a deal with our intelligent alert system.',
       color: 'text-purple-600'
     },
     {
-      icon: DevicePhoneMobileIcon,
-      title: 'Mobile Optimized',
-      description: 'Access your watchlist anywhere with our fully responsive mobile-friendly design.',
+      icon: ChartBarIcon,
+      title: 'Advanced Price Analytics',
+      description: 'View comprehensive price history charts, trend analysis, and price statistics to make informed purchase decisions.',
       color: 'text-orange-600'
     },
     {
-      icon: ClockIcon,
-      title: 'Historical Analytics',
-      description: 'Make informed decisions with comprehensive price history and trend analysis.',
+      icon: EyeIcon,
+      title: 'Smart Dashboard',
+      description: 'Manage all your tracked products in one place. See current prices, price changes, and savings at a glance.',
       color: 'text-red-600'
     },
     {
-      icon: ShieldCheckIcon,
-      title: 'Secure & Reliable',
-      description: 'Your data is protected with enterprise-grade security and 99.9% uptime.',
+      icon: DevicePhoneMobileIcon,
+      title: 'Mobile Responsive',
+      description: 'Access your price tracker anywhere with our fully responsive design. Perfect for on-the-go shopping.',
       color: 'text-indigo-600'
     }
   ];
 
+  const howItWorks = [
+    {
+      step: 1,
+      icon: PlusIcon,
+      title: 'Add Products',
+      description: 'Copy and paste any Amazon product URL. Our scraper automatically extracts the product details, current price, and images.',
+      color: 'bg-blue-500'
+    },
+    {
+      step: 2,
+      icon: EyeIcon,
+      title: 'Monitor Prices',
+      description: 'We continuously monitor prices and track historical data. View detailed price charts and trend analysis.',
+      color: 'bg-green-500'
+    },
+    {
+      step: 3,
+      icon: BellIcon,
+      title: 'Get Notified',
+      description: 'Receive instant alerts when prices drop significantly. Never miss a deal with our smart notification system.',
+      color: 'bg-purple-500'
+    },
+    {
+      step: 4,
+      icon: ShoppingCartIcon,
+      title: 'Save Money',
+      description: 'Buy at the perfect time when prices are at their lowest. Track your savings and make smarter purchasing decisions.',
+      color: 'bg-orange-500'
+    }
+  ];
+
   const benefits = [
-    'Track unlimited Amazon products',
-    'Set custom price alert thresholds',
+    'Track unlimited Amazon products for free',
+    'Get instant price drop notifications',
     'View detailed price history & trends',
-    'Get instant email notifications',
+    'Advanced price analytics and charts',
     'Mobile-optimized dashboard',
-    'Advanced search & filtering',
-    'Export data & reports',
-    'Completely free forever'
+    'Automatic product information extraction',
+    'Real-time price monitoring',
+    'Smart deal detection algorithms'
   ];
 
   const stats = [
@@ -76,19 +114,19 @@ const Home: React.FC = () => {
 
   const testimonials = [
     {
-      text: "PriceTracker saved me $300 on electronics this month! The alerts are incredibly fast and accurate.",
+      text: "PriceTracker saved me $300 on electronics this month! The Amazon URL tracking works perfectly and alerts come instantly.",
       author: "Sarah Johnson",
       role: "Tech Enthusiast",
       rating: 5
     },
     {
-      text: "As a deal hunter, this tool is invaluable. I never miss a price drop anymore!",
+      text: "I love how easy it is - just paste the Amazon link and it tracks everything automatically. The price charts are super helpful!",
       author: "Mike Chen",
       role: "Deal Hunter",
       rating: 5
     },
     {
-      text: "The interface is clean and the mobile app works perfectly. Highly recommended!",
+      text: "The mobile dashboard is fantastic. I can check my tracked products anywhere and never miss a price drop.",
       author: "Emma Davis",
       role: "Online Shopper",
       rating: 5
@@ -98,9 +136,9 @@ const Home: React.FC = () => {
   return (
     <>
       <SEO
-        title="PriceTracker - Amazon Price Tracking & Alerts | Never Miss a Deal"
-        description="Track Amazon prices and get instant alerts when prices drop. Never miss a deal again with PriceTracker - the ultimate Amazon price monitoring tool."
-        keywords="amazon price tracker, price alerts, deal finder, price monitoring, amazon deals, price drop alerts, shopping assistant"
+        title="PriceTracker - Amazon Price Monitoring & Alerts | Track Any Amazon Product"
+        description="Track Amazon prices automatically with PriceTracker. Simply paste any Amazon URL and get instant alerts when prices drop. Free Amazon price monitoring with real-time charts and notifications."
+        keywords="amazon price tracker, amazon price monitoring, price drop alerts, amazon deals, price tracking, amazon url tracker, automatic price monitoring, amazon price history"
         url="/"
       />
       
@@ -159,8 +197,8 @@ const Home: React.FC = () => {
               </h1>
               
               <p className="mt-6 max-w-3xl mx-auto text-lg sm:text-xl text-gray-600 leading-relaxed">
-                Never miss a deal again. Get instant alerts when Amazon prices drop below your target price.
-                Track unlimited products completely free with advanced analytics and mobile notifications.
+                Never miss a deal again. Automatically track Amazon prices and get instant alerts when prices drop. 
+                Simply paste any Amazon product URL and start saving money today - completely free forever.
               </p>
               
               <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -192,15 +230,69 @@ const Home: React.FC = () => {
           </div>
         </section>
 
+        {/* How It Works Section */}
+        <section className="py-16 lg:py-24 bg-gradient-to-r from-gray-50 to-slate-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+                How PriceTracker Works
+              </h2>
+              <p className="mt-4 max-w-3xl mx-auto text-lg sm:text-xl text-gray-600">
+                Start saving money in just 4 simple steps. No complex setup required.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {howItWorks.map((step, index) => (
+                <div key={index} className="relative">
+                  <div className="text-center">
+                    <div className="flex justify-center mb-6">
+                      <div className={`flex items-center justify-center w-16 h-16 ${step.color} rounded-2xl shadow-lg`}>
+                        <step.icon className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md border-2 border-gray-200">
+                      <span className="text-sm font-bold text-gray-700">{step.step}</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                  
+                  {/* Arrow for desktop */}
+                  {index < howItWorks.length - 1 && (
+                    <div className="hidden lg:block absolute top-8 -right-4 z-10">
+                      <ArrowRightIcon className="h-6 w-6 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-12 text-center">
+              <Link
+                to="/register"
+                className="inline-flex items-center bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <PlayIcon className="mr-2 h-5 w-5" />
+                Try It Now - It's Free!
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-                Why Choose PriceTracker?
+                Powerful Features for Smart Shopping
               </h2>
               <p className="mt-4 max-w-3xl mx-auto text-lg sm:text-xl text-gray-600">
-                Everything you need to become a smarter Amazon shopper with cutting-edge features
+                Everything you need to track Amazon prices and save money with our advanced monitoring system
               </p>
             </div>
             
@@ -232,10 +324,10 @@ const Home: React.FC = () => {
             <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
               <div>
                 <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-                  Everything You Need
+                  Start Saving Money Today
                 </h2>
                 <p className="mt-4 text-lg sm:text-xl text-gray-600">
-                  Join thousands of savvy shoppers who save money with PriceTracker's powerful features
+                  Join thousands of smart shoppers who use PriceTracker to automatically monitor Amazon prices and never miss a deal
                 </p>
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {benefits.map((benefit, index) => (
@@ -261,16 +353,34 @@ const Home: React.FC = () => {
               <div className="mt-12 lg:mt-0">
                 <div className="bg-white p-8 rounded-2xl shadow-xl">
                   <div className="flex items-center justify-center mb-6">
-                    <CurrencyDollarIcon className="h-12 w-12 text-green-600" />
+                    <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl">
+                      <ChartBarIcon className="h-8 w-8 text-green-600" />
+                    </div>
                   </div>
                   <div className="text-center">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Save Money Instantly</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">Live Price Monitoring</h3>
                     <p className="text-gray-600 mb-6">
-                      Our users save an average of $200+ per month by tracking price drops on their favorite products.
+                      Our advanced scraping system continuously monitors Amazon prices and updates your dashboard in real-time.
                     </p>
+                    
+                    {/* Demo Price Card */}
+                    <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-600">iPhone 15 Pro</span>
+                        <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">↓ 15% OFF</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-2xl font-bold text-green-600">$849.99</span>
+                          <span className="text-sm text-gray-500 line-through ml-2">$999.99</span>
+                        </div>
+                        <BellIcon className="h-5 w-5 text-green-600" />
+                      </div>
+                    </div>
+                    
                     <div className="bg-green-50 p-4 rounded-lg">
-                      <div className="text-3xl font-bold text-green-600">$2,000,000+</div>
-                      <div className="text-sm text-gray-600">Total saved by our users</div>
+                      <div className="text-xl font-bold text-green-600">$150 Saved!</div>
+                      <div className="text-sm text-gray-600">On this product alone</div>
                     </div>
                   </div>
                 </div>
@@ -316,24 +426,26 @@ const Home: React.FC = () => {
         <section className="py-16 lg:py-24 bg-gradient-to-r from-green-600 to-blue-600">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl mb-4">
-              Ready to Save Money?
+              Start Tracking Amazon Prices Today
             </h2>
             <p className="text-lg sm:text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of smart shoppers using PriceTracker to never miss a deal again
+              Join thousands of smart shoppers who save money with automatic price monitoring. Just paste any Amazon URL and we'll do the rest.
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Link
                 to="/register"
                 className="w-full sm:w-auto bg-white text-green-600 hover:bg-gray-100 px-8 py-4 rounded-xl text-lg font-semibold inline-flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
-                Get Started Now - It's Free!
+                <PlusIcon className="mr-2 h-5 w-5" />
+                Start Tracking for Free
                 <ArrowRightIcon className="ml-2 h-5 w-5" />
               </Link>
               <Link
-                to="/search"
-                className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200"
+                to="/dashboard"
+                className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 inline-flex items-center justify-center"
               >
-                Browse Products
+                <EyeIcon className="mr-2 h-5 w-5" />
+                View Dashboard
               </Link>
             </div>
           </div>
@@ -351,17 +463,18 @@ const Home: React.FC = () => {
                   <span className="text-white font-bold text-xl">PriceTracker</span>
                 </div>
                 <p className="text-gray-400 text-sm max-w-md">
-                  The ultimate Amazon price tracking tool. Never miss a deal again with real-time alerts and comprehensive price monitoring.
+                  The ultimate Amazon price tracking tool. Automatically monitor prices, get instant alerts, and save money on your favorite products. Simply paste any Amazon URL and start tracking.
                 </p>
               </div>
               
               <div>
                 <h3 className="text-white font-semibold mb-4">Features</h3>
                 <ul className="space-y-2 text-gray-400 text-sm">
-                  <li>Price Tracking</li>
-                  <li>Instant Alerts</li>
-                  <li>Price History</li>
-                  <li>Mobile App</li>
+                  <li>Amazon URL Tracking</li>
+                  <li>Price Drop Alerts</li>
+                  <li>Price History Charts</li>
+                  <li>Mobile Dashboard</li>
+                  <li>Real-time Monitoring</li>
                 </ul>
               </div>
               

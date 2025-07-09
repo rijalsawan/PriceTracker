@@ -26,8 +26,6 @@ const NotificationContainer: React.FC = () => {
         return '🎉';
       case 'PRICE_INCREASE':
         return '📈';
-      case 'TARGET_REACHED':
-        return '🎯';
       case 'SUCCESS':
         return '✅';
       case 'WARNING':
@@ -47,8 +45,6 @@ const NotificationContainer: React.FC = () => {
         return 'bg-green-50 border-green-200 text-green-800';
       case 'PRICE_INCREASE':
         return 'bg-red-50 border-red-200 text-red-800';
-      case 'TARGET_REACHED':
-        return 'bg-blue-50 border-blue-200 text-blue-800';
       case 'SUCCESS':
         return 'bg-green-50 border-green-200 text-green-800';
       case 'WARNING':

@@ -70,8 +70,12 @@ const Dashboard: React.FC = () => {
 
   const activeProducts = products.filter(p => p.isActive);
   const totalSavings = products.reduce((acc, product) => {
-    if (product.targetPrice && product.currentPrice <= product.targetPrice) {
-      return acc + (product.targetPrice - product.currentPrice);
+    // Calculate potential savings based on lowest price vs current price
+    if (product.priceHistory && product.priceHistory.length > 0) {
+      const lowestPrice = Math.min(...product.priceHistory.map(p => p.price));
+      if (product.currentPrice > lowestPrice) {
+        return acc + (product.currentPrice - lowestPrice);
+      }
     }
     return acc;
   }, 0);
@@ -121,7 +125,7 @@ const Dashboard: React.FC = () => {
                   Start tracking your first product
                 </h3>
                 <p className="text-slate-600 mb-8 leading-relaxed">
-                  Add Amazon products to your watchlist and get notified when prices drop to your target.
+                  Add Amazon products to your watchlist and get notified when prices drop.
                 </p>
                 <button
                   onClick={() => setShowAddModal(true)}
