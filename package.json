@@ -34,5 +34,8 @@
   "bugs": {
     "url": ""
   },
-  "homepage": ""
+  "homepage": "",
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0"
+  }
 }
