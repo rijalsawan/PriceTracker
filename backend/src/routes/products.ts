@@ -11,11 +11,9 @@ const prisma = new PrismaClient();
 // Validation schemas
 const addProductSchema = z.object({
   asin: z.string().regex(/^[A-Z0-9]{10}$/i, 'Invalid ASIN format'),
-  targetPrice: z.number().optional(),
 });
 
 const updateProductSchema = z.object({
-  targetPrice: z.number().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -82,7 +80,6 @@ router.get('/:id', async (req: AuthRequest, res) => {
             description: productInfo.description,
             imageUrl: productInfo.imageUrl,
             currentPrice: productInfo.price,
-            targetPrice: null,
             isActive: false,
             userId: req.user!.id,
             createdAt: new Date(),
@@ -127,7 +124,7 @@ router.get('/:id', async (req: AuthRequest, res) => {
 // Add new product
 router.post('/', async (req: AuthRequest, res) => {
   try {
-    const { asin, targetPrice } = addProductSchema.parse(req.body);
+    const { asin } = addProductSchema.parse(req.body);
 
     // Check if product already exists for this user
     const existingProduct = await prisma.product.findFirst({
@@ -158,7 +155,6 @@ router.post('/', async (req: AuthRequest, res) => {
         description: productInfo.description,
         imageUrl: productInfo.imageUrl,
         currentPrice: productInfo.price,
-        targetPrice,
         isActive: true,
         userId: req.user!.id
       },
@@ -429,6 +425,46 @@ router.post('/:id/add-test-price-history', async (req: AuthRequest, res) => {
     });
   } catch (error) {
     console.error('Add test price history error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get scraping logs for debugging (admin only or for specific product)
+router.get('/:id/scraping-logs', async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verify product belongs to user
+    const product = await prisma.product.findFirst({
+      where: { 
+        id,
+        userId: req.user!.id 
+      }
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Get recent scraping logs for this product
+    const scrapingLogs = await prisma.scrapingLog.findMany({
+      where: { 
+        productId: id 
+      },
+      orderBy: { timestamp: 'desc' },
+      take: 20 // Last 20 attempts
+    });
+
+    res.json({ 
+      product: {
+        id: product.id,
+        title: product.title,
+        url: product.url
+      },
+      scrapingLogs 
+    });
+  } catch (error) {
+    console.error('Get scraping logs error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

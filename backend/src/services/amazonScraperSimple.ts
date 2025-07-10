@@ -1,5 +1,8 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 interface ProductInfo {
   title: string;
@@ -35,8 +38,41 @@ const normalizeAmazonUrl = (url: string): string => {
   }
 };
 
+// Log scraping attempt to database
+const logScrapingAttempt = async (
+  url: string, 
+  status: string, 
+  priceFound?: number, 
+  priceSource?: string, 
+  errorMessage?: string, 
+  responseCode?: number,
+  userAgent?: string,
+  productId?: string
+) => {
+  try {
+    await prisma.scrapingLog.create({
+      data: {
+        url,
+        status,
+        priceFound,
+        priceSource,
+        errorMessage,
+        responseCode,
+        userAgent,
+        productId
+      }
+    });
+    console.log('✅ Scraping attempt logged:', { url, status, priceFound, priceSource });
+  } catch (error) {
+    console.error('❌ Failed to log scraping attempt:', error);
+    // Continue execution even if logging fails
+  }
+};
+
 // Fallback scraper using Axios + Cheerio with improved price extraction
-export const scrapeAmazonProduct = async (url: string, retries: number = 3): Promise<ProductInfo | null> => {
+export const scrapeAmazonProduct = async (url: string, retries: number = 3, productId?: string): Promise<ProductInfo | null> => {
+  let response: any = null; // Track response for logging
+  
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       console.log(`🔍 Scraping Amazon product (attempt ${attempt}/${retries})...`);
@@ -46,10 +82,15 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
         throw new Error('Invalid Amazon URL');
       }
 
-      // Normalize the URL to remove unnecessary parameters
+      // Normalize the URL to remove unnecessary parameters for consistency
       const normalizedUrl = normalizeAmazonUrl(url);
       console.log(`📍 Normalized URL: ${normalizedUrl}`);
 
+      // Use more specific parameters to get consistent pricing
+      const urlWithParams = new URL(normalizedUrl);
+      urlWithParams.searchParams.set('th', '1'); // Force specific variant
+      urlWithParams.searchParams.set('psc', '1'); // Force specific product configuration
+      
       // Rotate user agents to avoid detection
       const userAgents = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -62,7 +103,7 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
       const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
 
       // Make HTTP request with comprehensive headers to avoid detection
-      const response = await axios.get(normalizedUrl, {
+      response = await axios.get(urlWithParams.toString(), {
         headers: {
           'User-Agent': randomUserAgent,
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -74,7 +115,8 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
           'Sec-Fetch-Mode': 'navigate',
           'Sec-Fetch-Site': 'none',
           'Sec-Fetch-User': '?1',
-          'Cache-Control': 'max-age=0',
+          'Cache-Control': 'no-cache', // Prevent cached responses
+          'Pragma': 'no-cache',
           'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
           'sec-ch-ua-mobile': '?0',
           'sec-ch-ua-platform': '"Windows"',
@@ -89,6 +131,7 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
 
       // Check if we got a valid response
       if (response.status !== 200) {
+        await logScrapingAttempt(url, 'FAILED', undefined, undefined, `HTTP ${response.status}: ${response.statusText}`, response.status, randomUserAgent, productId);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
@@ -96,11 +139,13 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
 
       // Check if page contains CAPTCHA or is blocked
       if ($('#captchacharacters').length > 0 || $('form[action*="validateCaptcha"]').length > 0) {
+        await logScrapingAttempt(url, 'CAPTCHA', undefined, undefined, 'CAPTCHA detected - Amazon is blocking requests', response.status, randomUserAgent, productId);
         throw new Error('CAPTCHA detected - Amazon is blocking requests');
       }
 
       // Check if page is not found
       if ($('title').text().includes('Page Not Found') || $('.error-page').length > 0) {
+        await logScrapingAttempt(url, 'FAILED', undefined, undefined, 'Product page not found', response.status, randomUserAgent, productId);
         throw new Error('Product page not found');
       }
 
@@ -151,142 +196,133 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
 
     console.log(`Final title extracted: "${title}"`);
 
-    // Extract price with comprehensive selectors and logic
+    // Extract price with prioritized selectors for consistency
     let price = 0;
+    let priceSource = ''; // Track which selector found the price for debugging
+    
+    // Prioritized price selectors - most reliable first
     const priceSelectors = [
-      // Main price selectors
-      '.a-price.a-text-price.a-size-medium.apexPriceToPay .a-offscreen',
-      '.a-price-current .a-price-whole',
-      '.a-price .a-offscreen',
-      '.a-price-whole',
-      '#price_inside_buybox',
-      '.a-price-range',
+      // Primary current price selectors (highest priority) - Focus on main product price
+      { selector: '.a-price.a-text-price.a-size-medium.apexPriceToPay .a-offscreen', priority: 1, name: 'ApexPriceToPay' },
+      { selector: '#priceblock_dealprice', priority: 1, name: 'DealPrice' },
+      { selector: '#priceblock_ourprice', priority: 1, name: 'OurPrice' },
+      { selector: '#price_inside_buybox', priority: 1, name: 'BuyBoxPrice' },
       
-      // Alternative price selectors
-      '.a-price.a-text-price .a-offscreen',
-      '.a-price-to-pay .a-offscreen',
-      '.a-price-symbol-container .a-offscreen',
-      '.a-price-current .a-offscreen',
+      // Secondary reliable selectors - current price elements
+      { selector: '.a-price-current .a-price-whole', priority: 2, name: 'PriceCurrent' },
+      { selector: '.a-price .a-offscreen:first', priority: 2, name: 'FirstPriceOffscreen' },
+      { selector: '.a-price-to-pay .a-offscreen', priority: 2, name: 'PriceToPay' },
       
-      // Deal and sale price selectors
-      '.a-price.a-text-price.a-size-base.a-color-price .a-offscreen',
-      '.a-price.a-text-price.a-size-base .a-offscreen',
-      '.a-price.a-text-price.a-size-large.a-color-price .a-offscreen',
-      
-      // Kindle and digital content
-      '.a-price.a-text-price.a-size-medium.a-color-price .a-offscreen',
-      '.kindle-price .a-offscreen',
-      
-      // Used/refurbished prices
-      '.a-price.a-text-price.a-size-base.a-color-secondary .a-offscreen',
-      
-      // Fallback selectors
-      '[data-automation-id="product-price"]',
-      '.a-price-symbol',
-      '#buyNewSection .a-price .a-offscreen',
-      '#newAccordionRow .a-price .a-offscreen'
+      // Fallback selectors (lower priority)
+      { selector: '.a-price-whole:first', priority: 3, name: 'FirstPriceWhole' },
+      { selector: '[data-automation-id="product-price"]', priority: 3, name: 'ProductPriceData' },
     ];
     
-    console.log('🔍 Searching for price...');
+    console.log('🔍 Searching for price with prioritized selectors...');
     
-    for (const selector of priceSelectors) {
+    // Sort by priority and try each selector
+    priceSelectors.sort((a, b) => a.priority - b.priority);
+    
+    const foundPrices: Array<{price: number, source: string}> = [];
+    
+    for (const { selector, name } of priceSelectors) {
       const priceElements = $(selector);
       if (priceElements.length > 0) {
-        priceElements.each((_, element) => {
-          const priceText = $(element).text().trim();
-          console.log(`Checking selector "${selector}": "${priceText}"`);
+        const priceText = priceElements.first().text().trim();
+        console.log(`Checking ${name} selector "${selector}": "${priceText}"`);
+        
+        if (priceText) {
+          // Enhanced price cleaning and validation
+          let cleanPrice = priceText.replace(/[^\d.,]/g, '').replace(/,/g, '');
           
-          if (priceText) {
-            // Clean price text and extract number
-            const cleanPrice = priceText.replace(/[^\d.,]/g, '').replace(/,/g, '');
-            const priceMatch = cleanPrice.match(/^\d+\.?\d*$/);
-            
-            if (priceMatch) {
-              const foundPrice = parseFloat(priceMatch[0]);
-              if (foundPrice > 0 && foundPrice < 100000) {
+          // Handle multiple decimal points (keep only the last one)
+          const decimalIndex = cleanPrice.lastIndexOf('.');
+          if (decimalIndex !== -1) {
+            cleanPrice = cleanPrice.substring(0, decimalIndex).replace(/\./g, '') + cleanPrice.substring(decimalIndex);
+          }
+          
+          const priceMatch = cleanPrice.match(/^\d+\.?\d*$/);
+          
+          if (priceMatch) {
+            const foundPrice = parseFloat(priceMatch[0]);
+            // Validate price range (between $0.01 and $50,000)
+            if (foundPrice > 0.01 && foundPrice < 50000) {
+              foundPrices.push({ price: foundPrice, source: name });
+              console.log(`✅ Found valid price: $${foundPrice} from ${name} (${selector})`);
+              
+              // Take the first valid price from highest priority selector
+              if (!price) {
                 price = foundPrice;
-                console.log(`✅ Found price: $${price} from selector: ${selector}`);
-                return false; // Break out of each loop
+                priceSource = name;
               }
+            } else {
+              console.log(`⚠️ Price $${foundPrice} out of valid range, skipping...`);
             }
           }
-        });
-        
-        if (price > 0) break;
+        }
       }
     }
-
-    // If no price found with specific selectors, try more aggressive search
-    if (price === 0) {
-      console.log('🔍 Fallback price search...');
+    
+    // Validate price consistency if multiple prices found
+    if (foundPrices.length > 1) {
+      const prices = foundPrices.map(p => p.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const priceRange = maxPrice - minPrice;
+      const avgPrice = prices.reduce((sum, p) => sum + p, 0) / prices.length;
       
-      // Look for price in various containers
-      const priceContainers = [
-        '#apex_desktop',
-        '#centerCol',
-        '#rightCol',
-        '#buybox',
-        '#price',
-        '.a-section.a-spacing-none.aok-align-center'
-      ];
-      
-      for (const container of priceContainers) {
-        const $container = $(container);
-        if ($container.length > 0) {
-          // Look for text patterns that look like prices
-          const containerText = $container.text();
-          const pricePatterns = [
-            /\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g,
-            /USD\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g,
-            /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*USD/g
-          ];
-          
-          for (const pattern of pricePatterns) {
-            const matches = Array.from(containerText.matchAll(pattern));
-            if (matches.length > 0) {
-              for (const match of matches) {
-                const foundPrice = parseFloat(match[1].replace(/,/g, ''));
-                if (foundPrice > 0 && foundPrice < 100000) {
-                  price = foundPrice;
-                  console.log(`✅ Found price via pattern: $${price} from container: ${container}`);
-                  break;
-                }
-              }
-              if (price > 0) break;
-            }
-          }
-          if (price > 0) break;
+      // If prices vary by more than 10% or $5, use the most common price or log warning
+      if (priceRange > Math.max(avgPrice * 0.1, 5)) {
+        console.log(`⚠️ Price inconsistency detected: Range $${minPrice} - $${maxPrice}`);
+        console.log(`Found prices:`, foundPrices);
+        
+        // Use the price from the highest priority selector that's within reasonable range
+        const validPrices = foundPrices.filter(p => 
+          Math.abs(p.price - avgPrice) <= Math.max(avgPrice * 0.15, 10)
+        );
+        
+        if (validPrices.length > 0) {
+          price = validPrices[0].price;
+          priceSource = validPrices[0].source + '_Validated';
+          console.log(`✅ Using validated price: $${price} from ${priceSource}`);
         }
       }
     }
 
-    // Last resort: search all elements for price-like text
+    // Only use fallback if no price found with primary selectors
     if (price === 0) {
-      console.log('🔍 Last resort price search...');
+      console.log('🔍 Using conservative fallback price search...');
       
-      $('span, div, p').each((_, element) => {
-        const text = $(element).text().trim();
-        const className = $(element).attr('class') || '';
-        const id = $(element).attr('id') || '';
+      // Try combined whole/fraction approach for consistency
+      const priceContainer = $('.a-price').first();
+      if (priceContainer.length > 0) {
+        const wholePrice = priceContainer.find('.a-price-whole').text().replace(/[^0-9]/g, '');
+        const fractionPrice = priceContainer.find('.a-price-fraction').text().replace(/[^0-9]/g, '');
         
-        // Skip if element contains too much text (likely not a price)
-        if (text.length > 20) return;
-        
-        // Look for price-like patterns
-        if (text.match(/^\$\d+\.?\d*$/) || text.match(/^\d+\.?\d*$/) && (className.includes('price') || id.includes('price'))) {
-          const cleanText = text.replace(/[^\d.]/g, '');
-          const foundPrice = parseFloat(cleanText);
-          
-          if (foundPrice > 0 && foundPrice < 100000) {
+        if (wholePrice) {
+          const fraction = fractionPrice || '00';
+          const combinedPrice = `${wholePrice}.${fraction}`;
+          const foundPrice = parseFloat(combinedPrice) || 0;
+          if (foundPrice > 0.01 && foundPrice < 50000) {
             price = foundPrice;
-            console.log(`✅ Found price via last resort: $${price} from text: "${text}"`);
-            return false;
+            priceSource = 'CombinedWholeFraction';
+            console.log(`✅ Found combined price: $${price} from ${priceSource}`);
           }
         }
-      });
+      }
     }
 
-    console.log(`Final price extracted: $${price}`);
+    // Final validation
+    if (price === 0 || price <= 0.01) {
+      console.log('❌ No valid price found or price too low:', price);
+      await logScrapingAttempt(url, 'FAILED', price, priceSource, 'No valid price found or price too low', response?.status, randomUserAgent, productId);
+      return null;
+    }
+
+    console.log(`Final price extracted: $${price} from source: ${priceSource}`);
+
+    // Log successful scraping
+    await logScrapingAttempt(url, 'SUCCESS', price, priceSource, undefined, response?.status, randomUserAgent, productId);
 
     // Extract image URL
     let imageUrl = '';
@@ -334,7 +370,7 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
 
     const productInfo: ProductInfo = {
       title: title || 'Unknown Product',
-      price: price || 0,
+      price: price,
       imageUrl: imageUrl || '',
       description: description || 'Product description not available'
     };
@@ -342,14 +378,21 @@ export const scrapeAmazonProduct = async (url: string, retries: number = 3): Pro
       console.log('✅ Product scraped successfully:', {
         title: productInfo.title.substring(0, 50) + '...',
         price: productInfo.price,
+        priceSource: priceSource,
         hasImage: !!productInfo.imageUrl
       });
+
+      // Log successful scraping attempt
+      await logScrapingAttempt(url, 'SUCCESS', productInfo.price, priceSource, undefined, response.status, randomUserAgent, productId);
 
       return productInfo;
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown scraping error';
       console.error(`❌ Amazon scraping error (attempt ${attempt}/${retries}):`, errorMessage);
+      
+      // Log failed attempt
+      await logScrapingAttempt(url, 'FAILED', undefined, undefined, errorMessage, response?.status, undefined, productId);
       
       // If this is not the last attempt, wait before retrying
       if (attempt < retries) {
